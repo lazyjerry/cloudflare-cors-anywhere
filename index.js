@@ -17,6 +17,7 @@ The main goal is to facilitate cross-origin requests while enforcing specific se
 // whitelist = [ "^http.?://www.zibri.org$", "zibri.org$", "test\\..*" ];  // regexp for whitelisted urls
 const blacklistUrls = [];           // regexp for blacklisted urls
 const whitelistOrigins = [ ".*" ];   // regexp for whitelisted origins
+const PROXY_AUTH = "": // key for 'proxy-auth' with header
 
 // Function to check if a given URI or origin is listed in the whitelist or blacklist
 function isListedInWhitelist(uri, listing) {
@@ -62,7 +63,10 @@ addEventListener("fetch", async event => {
         const originHeader = event.request.headers.get("Origin");
         const connectingIp = event.request.headers.get("CF-Connecting-IP");
 
-        if ((!isListedInWhitelist(targetUrl, blacklistUrls)) && (isListedInWhitelist(originHeader, whitelistOrigins))) {
+        if ((!isListedInWhitelist(targetUrl, blacklistUrls)) 
+                && (isListedInWhitelist(originHeader, whitelistOrigins))
+                && ("" == PROXY_AUTH || PROXY_AUTH == event.request.headers.get("proxy-auth")) 
+            ) {
             let customHeaders = event.request.headers.get("x-cors-headers");
 
             if (customHeaders !== null) {

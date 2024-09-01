@@ -3,6 +3,12 @@ Cloudflare CORS proxy in a worker.
 
 CLOUDFLARE-CORS-ANYWHERE
 
+Jerry 添加一個 PROXY_AUTH 作為 key 防止濫用
+如果 PROXY_AUTH 有值，則必須在 header 中 proxy-auth 帶上相對應參數
+
+Blog Post:
+https://hipster.crazyjerry.studio/post/%e4%bd%bf%e7%94%a8-cloudflare-workers-%e8%99%95%e7%90%86%e5%89%8d%e7%ab%af%e8%b7%a8%e5%9f%9f%e5%95%8f%e9%a1%8c/
+
 Source:
 https://github.com/Zibri/cloudflare-cors-anywhere
 
