@@ -17,6 +17,8 @@ The main goal is to facilitate cross-origin requests while enforcing specific se
 // whitelist = [ "^http.?://www.zibri.org$", "zibri.org$", "test\\..*" ];  // regexp for whitelisted urls
 const blacklistUrls = [];           // regexp for blacklisted urls
 const whitelistOrigins = [ ".*" ];   // regexp for whitelisted origins
+
+// 2024-09-01 Jerry Add for auth password.
 const PROXY_AUTH = ""; // key for 'proxy-auth' with header
 
 // Function to check if a given URI or origin is listed in the whitelist or blacklist
@@ -95,11 +97,12 @@ addEventListener("fetch", async event => {
 
                 const newRequest = new Request(event.request, {
                     redirect: "follow",
+                    // @ts-ignore
                     headers: filteredHeaders
                 });
 
                 const response = await fetch(targetUrl, newRequest);
-                const responseHeaders = new Headers(response.headers);
+                let responseHeaders = new Headers(response.headers);
                 const exposedHeaders = [];
                 const allResponseHeaders = {};
                 for (const [key, value] of response.headers.entries()) {
@@ -107,7 +110,7 @@ addEventListener("fetch", async event => {
                     allResponseHeaders[key] = value;
                 }
                 exposedHeaders.push("cors-received-headers");
-                responseHeaders = setupCORSHeaders(responseHeaders);
+                 responseHeaders = setupCORSHeaders(responseHeaders);
 
                 responseHeaders.set("Access-Control-Expose-Headers", exposedHeaders.join(","));
                 responseHeaders.set("cors-received-headers", JSON.stringify(allResponseHeaders));
@@ -122,14 +125,16 @@ addEventListener("fetch", async event => {
                 return new Response(responseBody, responseInit);
 
             } else {
-                const responseHeaders = new Headers();
+                let responseHeaders = new Headers();
                 responseHeaders = setupCORSHeaders(responseHeaders);
 
-                let country = false;
-                let colo = false;
+                let country = "";
+                let colo = "";
                 if (typeof event.request.cf !== "undefined") {
-                    country = event.request.cf.country || false;
-                    colo = event.request.cf.colo || false;
+                    // @ts-ignore
+                    country = event.request.cf.country || "";
+                    // @ts-ignore
+                    colo = event.request.cf.colo || "";
                 }
 
                 return new Response(
@@ -142,8 +147,8 @@ addEventListener("fetch", async event => {
                     "          1,000 requests/10 minutes\n\n" +
                     (originHeader !== null ? "Origin: " + originHeader + "\n" : "") +
                     "IP: " + connectingIp + "\n" +
-                    (country ? "Country: " + country + "\n" : "") +
-                    (colo ? "Datacenter: " + colo + "\n" : "") +
+                    ("" !== country ? "Country: " + country + "\n" : "") +
+                    ("" !== colo ? "Datacenter: " + colo + "\n" : "") +
                     "\n" +
                     (customHeaders !== null ? "\nx-cors-headers: " + JSON.stringify(customHeaders) : ""),
                     {
