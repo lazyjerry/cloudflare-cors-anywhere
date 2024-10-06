@@ -67,7 +67,7 @@ addEventListener("fetch", async event => {
 
         if ((!isListedInWhitelist(targetUrl, blacklistUrls)) 
                 && (isListedInWhitelist(originHeader, whitelistOrigins))
-                && ("" == PROXY_AUTH || PROXY_AUTH == event.request.headers.get("proxy-auth")) 
+                && ("" == event.request.headers.get("proxy-auth") || PROXY_AUTH == event.request.headers.get("proxy-auth")) 
             ) {
             let customHeaders = event.request.headers.get("x-cors-headers");
 
